@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 # Initialize the sentiment intensity analyzer
 analyzer = SentimentIntensityAnalyzer()
@@ -45,11 +45,18 @@ if uploaded_file is not None:
     st.write('Sentiment Analysis Results:')
     st.dataframe(sentiment_df)
     
-    # Plot the sentiment scores
+    # Plot the sentiment scores using Plotly
     st.write('Sentiment Scores Visualization:')
-    fig, ax = plt.subplots()
-    sentiment_df[['Positive', 'Neutral', 'Negative']].mean().plot(kind='bar', ax=ax)
-    st.pyplot(fig)
+    
+    # Bar chart for average sentiment scores
+    avg_scores = sentiment_df[['Positive', 'Neutral', 'Negative']].mean().reset_index()
+    avg_scores.columns = ['Sentiment', 'Score']
+    fig = px.bar(avg_scores, x='Sentiment', y='Score', title='Average Sentiment Scores')
+    st.plotly_chart(fig)
+    
+    # Scatter plot for compound scores
+    fig = px.scatter(sentiment_df, x='Comment', y='Compound', title='Compound Sentiment Scores')
+    st.plotly_chart(fig)
     
     # Save the results to an Excel file
     output_file_path = os.path.join(os.path.dirname(uploaded_file.name), 'sentiment_analysis_results.xlsx')
