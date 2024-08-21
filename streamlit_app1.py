@@ -3,7 +3,6 @@ import pandas as pd
 import os
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import plotly.express as px
-import plotly.graph_objects as go
 
 # Initialize the sentiment intensity analyzer
 analyzer = SentimentIntensityAnalyzer()
@@ -23,12 +22,14 @@ if uploaded_file is not None:
     for comment in df['comment']:
         if isinstance(comment, str):
             sentiment_scores = analyzer.polarity_scores(comment.strip())
+            sentiment_category = max(sentiment_scores, key=sentiment_scores.get)
             results.append({
                 'Comment': comment.strip(),
                 'Compound': sentiment_scores['compound'],
                 'Positive': sentiment_scores['pos'],
                 'Neutral': sentiment_scores['neu'],
-                'Negative': sentiment_scores['neg']
+                'Negative': sentiment_scores['neg'],
+                'Sentiment': sentiment_category.capitalize()
             })
         else:
             results.append({
@@ -36,7 +37,8 @@ if uploaded_file is not None:
                 'Compound': None,
                 'Positive': None,
                 'Neutral': None,
-                'Negative': None
+                'Negative': None,
+                'Sentiment': 'Unknown'
             })
     
     # Convert the results to a DataFrame
@@ -46,11 +48,11 @@ if uploaded_file is not None:
     filter_option = st.selectbox('Filter by Sentiment', ['All', 'Positive', 'Neutral', 'Negative'])
     
     if filter_option == 'Positive':
-        filtered_df = sentiment_df[sentiment_df['Positive'] > sentiment_df[['Positive', 'Neutral', 'Negative']].max(axis=1)]
+        filtered_df = sentiment_df[sentiment_df['Sentiment'] == 'Positive']
     elif filter_option == 'Neutral':
-        filtered_df = sentiment_df[sentiment_df['Neutral'] > sentiment_df[['Positive', 'Neutral', 'Negative']].max(axis=1)]
+        filtered_df = sentiment_df[sentiment_df['Sentiment'] == 'Neutral']
     elif filter_option == 'Negative':
-        filtered_df = sentiment_df[sentiment_df['Negative'] > sentiment_df[['Positive', 'Neutral', 'Negative']].max(axis=1)]
+        filtered_df = sentiment_df[sentiment_df['Sentiment'] == 'Negative']
     else:
         filtered_df = sentiment_df
     
