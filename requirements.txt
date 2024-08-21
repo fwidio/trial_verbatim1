@@ -3,3 +3,4 @@ vaderSentiment
 pandas
 matplotlib
 openpyxl
+plotly
