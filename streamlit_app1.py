@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import plotly.express as px
+import plotly.graph_objects as go
 
 # Initialize the sentiment intensity analyzer
 analyzer = SentimentIntensityAnalyzer()
@@ -41,9 +42,21 @@ if uploaded_file is not None:
     # Convert the results to a DataFrame
     sentiment_df = pd.DataFrame(results)
     
-    # Display the dataframe
+    # Filter options
+    filter_option = st.selectbox('Filter by Sentiment', ['All', 'Positive', 'Neutral', 'Negative'])
+    
+    if filter_option == 'Positive':
+        filtered_df = sentiment_df[sentiment_df['Positive'] > sentiment_df[['Positive', 'Neutral', 'Negative']].max(axis=1)]
+    elif filter_option == 'Neutral':
+        filtered_df = sentiment_df[sentiment_df['Neutral'] > sentiment_df[['Positive', 'Neutral', 'Negative']].max(axis=1)]
+    elif filter_option == 'Negative':
+        filtered_df = sentiment_df[sentiment_df['Negative'] > sentiment_df[['Positive', 'Neutral', 'Negative']].max(axis=1)]
+    else:
+        filtered_df = sentiment_df
+    
+    # Display the filtered dataframe
     st.write('Sentiment Analysis Results:')
-    st.dataframe(sentiment_df)
+    st.dataframe(filtered_df)
     
     # Plot the sentiment scores using Plotly
     st.write('Sentiment Scores Visualization:')
@@ -52,6 +65,11 @@ if uploaded_file is not None:
     avg_scores = sentiment_df[['Positive', 'Neutral', 'Negative']].mean().reset_index()
     avg_scores.columns = ['Sentiment', 'Score']
     fig = px.bar(avg_scores, x='Sentiment', y='Score', title='Average Sentiment Scores')
+    
+    # Add click event to filter table
+    fig.update_traces(marker=dict(color=['blue', 'orange', 'red']))
+    fig.update_layout(clickmode='event+select')
+    
     st.plotly_chart(fig)
     
     # Scatter plot for compound scores
