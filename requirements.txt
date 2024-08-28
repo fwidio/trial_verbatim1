@@ -10,3 +10,4 @@ textblob
 scikit-learn
 seaborn
 numpy
+openpyxl
