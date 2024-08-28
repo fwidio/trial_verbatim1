@@ -2,5 +2,11 @@ streamlit
 vaderSentiment
 pandas
 matplotlib
-openpyxl
 plotly
+gensim
+nltk
+spacy
+textblob
+scikit-learn
+seaborn
+numpy
