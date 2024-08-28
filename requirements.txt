@@ -12,3 +12,4 @@ seaborn
 numpy
 openpyxl
 pyobject
+pytorch
