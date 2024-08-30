@@ -14,4 +14,3 @@ openpyxl
 pyobject
 torch
 pyproject.toml
-sys
