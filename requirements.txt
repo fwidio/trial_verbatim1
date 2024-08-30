@@ -13,5 +13,4 @@ numpy
 openpyxl
 pyobject
 pytorch
-pyproject
 pyproject.toml
