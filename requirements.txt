@@ -12,5 +12,5 @@ seaborn
 numpy
 openpyxl
 pyobject
-pytorch
+torch
 pyproject.toml
