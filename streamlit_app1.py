@@ -18,6 +18,19 @@ from nltk.tokenize import word_tokenize
 import plotly.express as px
 import plotly.graph_objects as go
 
+import subprocess
+import sys
+
+# Function to download spaCy model
+def download_spacy_model():
+    subprocess.run([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
+
+# Check if the model is already downloaded
+try:
+    import en_core_web_sm
+except ImportError:
+    download_spacy_model()
+
 # Download necessary NLTK data
 import nltk
 nltk.download('punkt')
