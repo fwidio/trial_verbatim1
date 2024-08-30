@@ -14,5 +14,4 @@ openpyxl
 pyobject
 torch
 pyproject.toml
-subprocess
 sys
