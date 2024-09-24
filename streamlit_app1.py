@@ -38,7 +38,8 @@ import pandas as pd
 # File upload section side by side
 col1, col2 = st.columns(2)
 with col1:
-    file_paths = st.file_uploader("Upload your Master File (.txt)", type="txt")
+    master_file = st.file_uploader("Upload your Master Database (.xlsx)", type="xlsx")
+    input_file = st.file_uploader("Upload your Input File (.xlsx)", type="xlsx")
 with col2:
     # Selection of type of data
     data_type = st.selectbox("Select the type of data", ["Pulse Survey", "CSAT Feedback", "Lifecycle Applying Challenge", "Contact Center"])
