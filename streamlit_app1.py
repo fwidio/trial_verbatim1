@@ -32,35 +32,17 @@ vader_analyzer = SentimentIntensityAnalyzer()
 # Streamlit app layout
 st.title("Sentiment Analysis and Topic Prediction")
 
-import streamlit as st
-import pandas as pd
-
 # File upload section side by side
 col1, col2 = st.columns(2)
 with col1:
-    master_file = st.file_uploader("Upload your Master Database (.xlsx)", type="xlsx")
-    input_file = st.file_uploader("Upload your Input File (.xlsx)", type="xlsx")
-with col2:
     # Selection of type of data
     data_type = st.selectbox("Select the type of data", ["Pulse Survey", "CSAT Feedback", "Lifecycle Applying Challenge", "Contact Center"])
+with col2:
+    comments_file = st.file_uploader("Upload your input file (.xlsx)", type="xlsx")
 
-if file_paths:
-    try:
-        # Read the paths from the uploaded text file
-        lines = file_paths.read().decode("utf-8").splitlines()
-        if len(lines) < 2:
-            st.error("The file does not contain enough lines.")
-        else:
-            database_path = lines[0].split('=')[1].strip()
-            input_file_path = lines[1].split('=')[1].strip()
-    except IndexError:
-        st.error("There was an error reading the file paths. Please check the format of the file.")
-    except Exception as e:
-        st.error(f"An unexpected error occurred: {e}")
-
-    # Use the paths from the text file
-    master_db_path = database_path
-    comments_file_path = input_file_path
+if comments_file:
+    # Insert the database inside the comment since I have a file called master database
+    master_db_path = r"C:\Users\fwidio\Downloads\Master Database.xlsx"
     
     # Read the appropriate sheet based on the selected data type
     if data_type == "Pulse Survey":
@@ -72,8 +54,8 @@ if file_paths:
     elif data_type == "Contact Center":
         subtopics_df = pd.read_excel(master_db_path, sheet_name="Contact Center")
 
-    comments_df = pd.read_excel(comments_file_path)
-
+    comments_df = pd.read_excel(comments_file)
+    
     # Read custom lexicon from the master database
     custom_lexicon_df = pd.read_excel(master_db_path, sheet_name="custom lexicon")
     custom_lexicon = pd.Series(custom_lexicon_df['Sentiment Score'].values, index=custom_lexicon_df['Word']).to_dict()
@@ -81,15 +63,18 @@ if file_paths:
     # Update VADER's lexicon with custom words
     vader_analyzer.lexicon.update(custom_lexicon)
 
-    def clean_dataframe(df):
-        # Remove rows that are empty or consist only of '-', '_', '0', 'none', or 'no'
-        df.replace(['-', '_', '0', 'none', 'no','n/a','.',' ','`-','n.a.','..'], pd.NA, inplace=True)
-        df.dropna(how='all', inplace=True)
-        return df
+def clean_dataframe(df):
+    # Remove rows that are empty or consist only of '-', '_', '0', 'none', or 'no'
+    df.replace(['-', '_', '0', 'none', 'no','n/a','.',' ','`-','n.a.','..'], pd.NA, inplace=True)
+    df.dropna(how='all', inplace=True)
+    return df
 
+if comments_file:
+    comments_df = pd.read_excel(comments_file)
+    
     # Clean the comments dataframe
     comments_df = clean_dataframe(comments_df)
-
+    
     if 'comment' not in comments_df.columns:
         st.error("The 'comment' column is not present in your input Excel file.")
     else:
@@ -196,7 +181,7 @@ if file_paths:
 
         combined_df['Category'] = combined_df['Predicted Sub Topic'].apply(get_topic)
 
-        # Rename the 'Category' column to 'Predicted Topic'
+        # Rename the 'Category' column to 'Topic'
         combined_df = combined_df.rename(columns={'Category': 'Predicted Topic'})
 
         # Define sentiment categories based on the conditions
