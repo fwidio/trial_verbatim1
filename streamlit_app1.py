@@ -4,6 +4,7 @@ import gensim
 from gensim.utils import simple_preprocess
 from gensim.models import Phrases
 from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 import spacy
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
@@ -103,6 +104,13 @@ if comments_file:
 
         def make_trigrams(texts):
             return [trigram_mod[bigram_mod[doc]] for doc in texts]
+
+        def lemmatization(texts, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV']):
+            lemmatizer = WordNetLemmatizer()
+            texts_out = []
+            for sent in texts:
+                texts_out.append([lemmatizer.lemmatize(word) for word in sent if word in allowed_postags])
+            return texts_out
 
         data_words_nostops = remove_stopwords(data_words)
         data_words_bigrams = make_bigrams(data_words_nostops)
