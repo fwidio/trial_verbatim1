@@ -39,11 +39,9 @@ with col1:
     data_type = st.selectbox("Select the type of data", ["Pulse Survey", "CSAT Feedback", "Lifecycle Applying Challenge", "Contact Center"])
 with col2:
     comments_file = st.file_uploader("Upload your input file (.xlsx)", type="xlsx")
+    master_db_path = st.file_uploader("Upload your Master Database (.xlsx)", type="xlsx")
 
-if comments_file:
-    # Insert the database inside the comment since I have a file called master database
-    master_db_path = r"C:\Users\fwidio\Downloads\Master Database.xlsx"
-    
+if comments_file and master_db_path:
     # Read the appropriate sheet based on the selected data type
     if data_type == "Pulse Survey":
         subtopics_df = pd.read_excel(master_db_path, sheet_name="Pulse")
@@ -53,7 +51,7 @@ if comments_file:
         subtopics_df = pd.read_excel(master_db_path, sheet_name="Lifecycle Applying Challenge")
     elif data_type == "Contact Center":
         subtopics_df = pd.read_excel(master_db_path, sheet_name="Contact Center")
-
+        
     comments_df = pd.read_excel(comments_file)
     
     # Read custom lexicon from the master database
