@@ -38,7 +38,7 @@ with col1:
     # Selection of type of data
     data_type = st.selectbox("Select the type of data", ["Pulse Survey", "CSAT Feedback", "Lifecycle Applying Challenge", "Contact Center"])
 with col2:
-    comments_file = st.file_uploader("Upload your input file (.xlsx)", type="xlsx")
+    comments_file_path = r"C:\Users\fwidio\Downloads\train_csatAug24_new.xlsx"
 
 if comments_file:
     # Insert the database inside the comment since I have a file called master database
