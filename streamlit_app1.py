@@ -51,7 +51,7 @@ if comments_file and master_db_path:
         subtopics_df = pd.read_excel(master_db_path, sheet_name="Lifecycle Applying Challenge")
     elif data_type == "Contact Center":
         subtopics_df = pd.read_excel(master_db_path, sheet_name="Contact Center")
-
+        
     comments_df = pd.read_excel(comments_file)
 
     # Continue with your processing logic here
