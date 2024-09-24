@@ -104,14 +104,6 @@ if comments_file:
         def make_trigrams(texts):
             return [trigram_mod[bigram_mod[doc]] for doc in texts]
 
-        def lemmatization(texts, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV']):
-            texts_out = []
-            nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
-            for sent in texts:
-                doc = nlp(" ".join(sent))
-                texts_out.append([token.lemma_ for token in doc if token.pos_ in allowed_postags])
-            return texts_out
-
         data_words_nostops = remove_stopwords(data_words)
         data_words_bigrams = make_bigrams(data_words_nostops)
         data_lemmatized = lemmatization(data_words_bigrams, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
