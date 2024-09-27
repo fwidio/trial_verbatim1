@@ -41,7 +41,9 @@ with col1:
 with col2:
     master_db_path = st.file_uploader("Upload your Master Database (.xlsx)", type="xlsx")
     comments_file = st.file_uploader("Upload your input file (.xlsx)", type="xlsx")
-    
+
+database_path = None
+input_file_path = None
 
 if comments_file and master_db_path:
     # Read the appropriate sheet based on the selected data type
