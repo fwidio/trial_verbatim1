@@ -45,7 +45,11 @@ with col2:
 database_path = None
 input_file_path = None
 
-if st.button('Run Analysis'):
+# Check if both files are uploaded
+if not master_db_path or not comments_file:
+    st.error("Both the Master Database and the input file must be uploaded.")
+else:
+    # Proceed with the rest of your code
     if comments_file and master_db_path:
         # Read the appropriate sheet based on the selected data type
         if data_type == "Pulse Survey":
