@@ -4,6 +4,7 @@ import gensim
 from gensim.utils import simple_preprocess
 from gensim.models import Phrases
 from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 import spacy
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
@@ -38,27 +39,14 @@ with col1:
     # Selection of type of data
     data_type = st.selectbox("Select the type of data", ["Pulse Survey", "CSAT Feedback", "Lifecycle Applying Challenge", "Contact Center"])
 with col2:
-    file_paths = st.file_uploader("Upload your Master File (.txt)", type="txt")
+    master_db_path = st.file_uploader("Upload your Master Database (.xlsx)", type="xlsx")
+    comments_file = st.file_uploader("Upload your input file (.xlsx)", type="xlsx")
+
+database_path = None
+input_file_path = None
 
 if st.button('Run Analysis'):
-    if file_paths:
-        try:
-            # Read the paths from the uploaded text file
-            lines = file_paths.read().decode("utf-8").splitlines()
-            if len(lines) < 2:
-                st.error("The file does not contain enough lines.")
-            else:
-                database_path = lines[0].split('=')[1].strip()
-                input_file_path = lines[1].split('=')[1].strip()
-        except IndexError:
-            st.error("There was an error reading the file paths. Please check the format of the file.")
-        except Exception as e:
-            st.error(f"An unexpected error occurred: {e}")
-            
-        # Use the paths from the text file
-        master_db_path = database_path
-        comments_file = input_file_path
-    
+    if comments_file and master_db_path:
         # Read the appropriate sheet based on the selected data type
         if data_type == "Pulse Survey":
             subtopics_df = pd.read_excel(master_db_path, sheet_name="Pulse")
@@ -68,9 +56,9 @@ if st.button('Run Analysis'):
             subtopics_df = pd.read_excel(master_db_path, sheet_name="Lifecycle Applying Challenge")
         elif data_type == "Contact Center":
             subtopics_df = pd.read_excel(master_db_path, sheet_name="Contact Center")
-
+            
         comments_df = pd.read_excel(comments_file)
-
+        
         # Read custom lexicon from the master database
         custom_lexicon_df = pd.read_excel(master_db_path, sheet_name="custom lexicon")
         custom_lexicon = pd.Series(custom_lexicon_df['Sentiment Score'].values, index=custom_lexicon_df['Word']).to_dict()
@@ -122,11 +110,10 @@ if st.button('Run Analysis'):
                 return [trigram_mod[bigram_mod[doc]] for doc in texts]
 
             def lemmatization(texts, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV']):
+                lemmatizer = WordNetLemmatizer()
                 texts_out = []
-                nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
                 for sent in texts:
-                    doc = nlp(" ".join(sent))
-                    texts_out.append([token.lemma_ for token in doc if token.pos_ in allowed_postags])
+                    texts_out.append([lemmatizer.lemmatize(word) for word in sent if word in allowed_postags])
                 return texts_out
 
             data_words_nostops = remove_stopwords(data_words)
