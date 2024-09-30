@@ -37,7 +37,7 @@ st.title("Sentiment Analysis and Topic Prediction")
 col1, col2 = st.columns(2)
 with col1:
     # Selection of type of data
-    data_type = st.selectbox("Select the type of data", ["Pulse Survey", "CSAT Feedback", "Lifecycle Applying Challenge", "Contact Center"])
+    data_type = st.selectbox("Select the type of data", ["Pulse Survey", "CSAT Feedback", "Lifecycle"])
 with col2:
     master_db_path = st.file_uploader("Upload your Master Database (.xlsx)", type="xlsx")
     comments_file = st.file_uploader("Upload your input file (.xlsx)", type="xlsx")
