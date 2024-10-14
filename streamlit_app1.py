@@ -56,7 +56,7 @@ else:
             subtopics_df = pd.read_excel(master_db_path, sheet_name="Pulse")
         elif data_type == "CSAT Feedback":
             subtopics_df = pd.read_excel(master_db_path, sheet_name="CSAT")
-        elif data_type == "Lifecycle Applying Challenge":
+        elif data_type == "Lifecycle":
             subtopics_df = pd.read_excel(master_db_path, sheet_name="Lifecycle")
         elif data_type == "Contact Center":
             subtopics_df = pd.read_excel(master_db_path, sheet_name="Contact Center")
