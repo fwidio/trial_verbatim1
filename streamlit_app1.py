@@ -29,7 +29,9 @@ st.set_page_config(layout="wide")
 # Function to display the home page
 def home():
     st.title("Welcome to the Python-Based Verbatim Tool")
-    st.caption("Version updated 18 October 2024")
+    st.caption("Version updated 25 October 2024")
+    st.caption("What's new? Contact Center Tool")
+    st.caption("Note: Please double click the button")
     if st.button("CSAT, Lifecycle, Pulse, Townhall"):
         st.session_state.page = "CSAT, Lifecycle, Pulse, Townhall"
     if st.button("Contact Center"):
