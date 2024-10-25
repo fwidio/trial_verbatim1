@@ -445,6 +445,13 @@ def contact_center():
     st.write("Content for Contact Center page goes here.")
 
     # Function to clean the 'Subject' column
+    import pandas as pd
+    import streamlit as st
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+    import plotly.express as px
+
+    # Function to clean the 'Subject' column
     def clean_subject(subject):
         if pd.isna(subject):
             return ""
@@ -468,32 +475,47 @@ def contact_center():
     if input_file and database_file:
         # Read the input file
         input_df = pd.read_excel(input_file)
-        # Read the database file
-        database_df = pd.read_excel(database_file, sheet_name='tag')
+        # Read the topic database file
+        topic_df = pd.read_excel(database_file, sheet_name='tag')
+        # Read the subtopic database file
+        subtopic_df = pd.read_excel(database_file, sheet_name='subtag')
         
         # Clean the 'Subject' column in both dataframes
         input_df['Subject'] = input_df['Subject'].apply(clean_subject)
-        database_df['Cleaned_Subject'] = database_df['Subject'].apply(clean_subject)
+        topic_df['Cleaned_Subject'] = topic_df['Subject'].apply(clean_subject)
+        subtopic_df['Cleaned_Subject'] = subtopic_df['Subject'].apply(clean_subject)
         
         # Remove blank rows in the database
-        database_df = database_df[database_df['Cleaned_Subject'] != ""]
+        topic_df = topic_df[topic_df['Cleaned_Subject'] != ""]
+        subtopic_df = subtopic_df[subtopic_df['Cleaned_Subject'] != ""]
         
         # Initialize columns for 'Topic' and 'Sub Topic'
         input_df['Topic'] = ""
-        #input_df['Sub Topic'] = ""
+        input_df['Sub Topic'] = ""
         
-        # Vectorize the subjects using TF-IDF
-        vectorizer = TfidfVectorizer().fit_transform(database_df['Cleaned_Subject'].tolist() + input_df['Subject'].tolist())
+        # Vectorize the subjects using TF-IDF for topics
+        vectorizer_topic = TfidfVectorizer().fit_transform(topic_df['Cleaned_Subject'].tolist() + input_df['Subject'].tolist())
         
-        # Calculate cosine similarity between input subjects and database subjects
-        cosine_similarities = cosine_similarity(vectorizer[len(database_df):], vectorizer[:len(database_df)])
+        # Calculate cosine similarity between input subjects and topic subjects
+        cosine_similarities_topic = cosine_similarity(vectorizer_topic[len(topic_df):], vectorizer_topic[:len(topic_df)])
         
-        # Match subjects and assign 'Topic' and 'Sub Topic'
+        # Match subjects and assign 'Topic'
         for i, row in input_df.iterrows():
-            most_similar_idx = cosine_similarities[i].argmax()
-            if cosine_similarities[i][most_similar_idx] > 0.5:  # You can adjust the threshold as needed
-                input_df.at[i, 'Topic'] = database_df.iloc[most_similar_idx]['Topic']
-                #input_df.at[i, 'Sub Topic'] = database_df.iloc[most_similar_idx]['Sub Topic']
+            most_similar_idx_topic = cosine_similarities_topic[i].argmax()
+            if cosine_similarities_topic[i][most_similar_idx_topic] > 0.5:  # You can adjust the threshold as needed
+                input_df.at[i, 'Topic'] = topic_df.iloc[most_similar_idx_topic]['Topic']
+        
+        # Vectorize the subjects using TF-IDF for subtopics
+        vectorizer_subtopic = TfidfVectorizer().fit_transform(subtopic_df['Cleaned_Subject'].tolist() + input_df['Subject'].tolist())
+        
+        # Calculate cosine similarity between input subjects and subtopic subjects
+        cosine_similarities_subtopic = cosine_similarity(vectorizer_subtopic[len(subtopic_df):], vectorizer_subtopic[:len(subtopic_df)])
+        
+        # Match subjects and assign 'Sub Topic'
+        for i, row in input_df.iterrows():
+            most_similar_idx_subtopic = cosine_similarities_subtopic[i].argmax()
+            if cosine_similarities_subtopic[i][most_similar_idx_subtopic] > 0.5:  # You can adjust the threshold as needed
+                input_df.at[i, 'Sub Topic'] = subtopic_df.iloc[most_similar_idx_subtopic]['Sub Topic']
         
         # Handle cases where topic is blank by reading the 'blank' sheet
         blank_sheet = pd.read_excel(database_file, sheet_name='blank')
@@ -510,7 +532,6 @@ def contact_center():
                         input_df.at[i, 'Topic'] = blank_row['Topic']
                         break
 
-        
         # Display the updated dataframe
         st.write("Updated DataFrame:")
         st.dataframe(input_df)
@@ -526,15 +547,37 @@ def contact_center():
         # Count the number of occurrences of each topic
         topic_counts = input_df['Topic'].value_counts().sort_values(ascending=False)
         
+        # Get top 10 topics with their counts and percentages
+        top_10_topics_counts = topic_counts.head(10)
+        top_10_topics_percentages = (top_10_topics_counts / topic_counts.sum()) * 100
+        
+        # Create DataFrame with formatted percentages rounded to one decimal place
+        top_10_table_data = pd.DataFrame({
+            'Topic': top_10_topics_counts.index,
+            'Count': top_10_topics_counts.values,
+            'Percentage': [f"{x:.1f}%" for x in top_10_topics_percentages.values]
+        })
+
+        # Adjust the index to start from 1
+        top_10_table_data.index = range(1, len(top_10_table_data) + 1)
+
+        # Display the table dynamically
+        st.write("Top 10 Topics with Counts and Percentages:")
+        st.dataframe(top_10_table_data.style.set_properties(**{'text-align': 'center'}).set_table_styles(
+            [{'selector': 'th', 'props': [('text-align', 'center')]}]
+        ))
+        
         # Plot the bar chart with Plotly Express for better aesthetics and dynamic interactivity with Streamlit
         st.write("Number of Topics (sorted by highest to lowest count):")
         
-        fig = px.bar(topic_counts, x=topic_counts.values, y=topic_counts.index, orientation='h', 
+        fig1 = px.bar(topic_counts, x=topic_counts.values, y=topic_counts.index, orientation='h', 
                     labels={'x': 'Count', 'y': 'Topics'}, title='Number of Topics')
         
-        fig.update_layout(yaxis={'categoryorder':'total ascending'}, height=1000)
+        # Update layout to format percentages, start numbering from 1, and center text
+        fig1.update_layout(yaxis={'categoryorder':'total ascending'}, height=1000)
+        fig1.update_traces(texttemplate='%{x}', textposition='inside', insidetextanchor='middle')
         
-        st.plotly_chart(fig)
+        st.plotly_chart(fig1)
 
 
     if st.button("Back to Home Page"):
