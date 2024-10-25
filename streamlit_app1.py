@@ -445,12 +445,6 @@ def contact_center():
     st.write("Content for Contact Center page goes here.")
 
     # Function to clean the 'Subject' column
-    import pandas as pd
-    import streamlit as st
-    from sklearn.feature_extraction.text import TfidfVectorizer
-    from sklearn.metrics.pairwise import cosine_similarity
-    import plotly.express as px
-
     # Function to clean the 'Subject' column
     def clean_subject(subject):
         if pd.isna(subject):
