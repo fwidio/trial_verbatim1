@@ -445,7 +445,6 @@ def contact_center():
     st.write("Content for Contact Center page goes here.")
 
     # Function to clean the 'Subject' column
-    # Function to clean the 'Subject' column
     def clean_subject(subject):
         if pd.isna(subject):
             return ""
@@ -457,6 +456,11 @@ def contact_center():
         subject = subject.replace('(', '')
         subject = subject.replace(')', '')
         return subject
+
+    # Function to check if the first word is all uppercase
+    def is_first_word_uppercase(sentence):
+        words = sentence.split()
+        return words[0].isupper()
 
     # Streamlit app
     st.title("Topic & Sub Topic Finder")
@@ -495,9 +499,15 @@ def contact_center():
         
         # Match subjects and assign 'Topic'
         for i, row in input_df.iterrows():
-            most_similar_idx_topic = cosine_similarities_topic[i].argmax()
-            if cosine_similarities_topic[i][most_similar_idx_topic] > 0.5:  # You can adjust the threshold as needed
-                input_df.at[i, 'Topic'] = topic_df.iloc[most_similar_idx_topic]['Topic']
+            if is_first_word_uppercase(row['Subject']):
+                first_word = row['Subject'].split()[0]
+                matched_topic = topic_df[topic_df['Cleaned_Subject'].str.startswith(first_word)]['Topic']
+                if not matched_topic.empty:
+                    input_df.at[i, 'Topic'] = matched_topic.values[0]
+            else:
+                most_similar_idx_topic = cosine_similarities_topic[i].argmax()
+                if cosine_similarities_topic[i][most_similar_idx_topic] > 0.5:  # You can adjust the threshold as needed
+                    input_df.at[i, 'Topic'] = topic_df.iloc[most_similar_idx_topic]['Topic']
         
         # Vectorize the subjects using TF-IDF for subtopics
         vectorizer_subtopic = TfidfVectorizer().fit_transform(subtopic_df['Cleaned_Subject'].tolist() + input_df['Subject'].tolist())
@@ -555,12 +565,38 @@ def contact_center():
         # Adjust the index to start from 1
         top_10_table_data.index = range(1, len(top_10_table_data) + 1)
 
+        # Display total number of transactions above the table
+        total_transactions = len(input_df)
+        st.write(f"Total transactions: {total_transactions}")
+
         # Display the table dynamically
         st.write("Top 10 Topics with Counts and Percentages:")
         st.dataframe(top_10_table_data.style.set_properties(**{'text-align': 'center'}).set_table_styles(
             [{'selector': 'th', 'props': [('text-align', 'center')]}]
         ))
         
+        # Get top 3 subtopics for each of the top 10 topics with their counts and percentages compared to overall data
+        top_3_subtopics_data_overall = []
+        for topic in top_10_topics_counts.index:
+            subtopics_counts_overall = input_df[input_df['Topic'] == topic]['Sub Topic'].value_counts().head(3)
+            subtopics_percentages_overall = (subtopics_counts_overall / total_transactions) * 100
+
+            for subtopic, count, percentage in zip(subtopics_counts_overall.index, subtopics_counts_overall.values, subtopics_percentages_overall.values):
+                top_3_subtopics_data_overall.append({
+                    'Topic': topic,
+                    'Sub Topic': subtopic,
+                    'Count': count,
+                    'Percentage': f"{percentage:.1f}%"
+                })
+
+        top_3_subtopics_table_data_overall = pd.DataFrame(top_3_subtopics_data_overall)
+
+        # Display the subtopic table dynamically
+        st.write("Top 3 Subtopics for Each Top Topic with Counts and Percentages Compared to Overall Data:")
+        st.dataframe(top_3_subtopics_table_data_overall.style.set_properties(**{'text-align': 'center'}).set_table_styles(
+            [{'selector': 'th', 'props': [('text-align', 'center')]}]
+        ))
+
         # Plot the bar chart with Plotly Express for better aesthetics and dynamic interactivity with Streamlit
         st.write("Number of Topics (sorted by highest to lowest count):")
         
@@ -572,7 +608,6 @@ def contact_center():
         fig1.update_traces(texttemplate='%{x}', textposition='inside', insidetextanchor='middle')
         
         st.plotly_chart(fig1)
-
 
     if st.button("Back to Home Page"):
         st.session_state.page = "home"
