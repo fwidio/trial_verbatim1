@@ -22,7 +22,6 @@ from mtranslate import translate # type: ignore
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-
 # Set the page configuration to wide
 st.set_page_config(layout="wide")
 
@@ -44,10 +43,10 @@ def home():
     col1, col2 = st.columns([2, 1])
 
     with col1:
-        st.image("C:/Users/fwidio/Downloads/How to Use.png", use_column_width=True)
+        st.image("How to Use.png", use_column_width=True)
         
     with col2:
-        if st.button("CSAT | Lifecycle | Pulse | Townhall"):
+        if st.button("CSAT, Lifecycle, Pulse, Townhall"):
             st.session_state.page = "CSAT, Lifecycle, Pulse, Townhall"
         if st.button("Contact Center"):
             st.session_state.page = "Contact Center"
@@ -67,66 +66,7 @@ def csat_lifecycle_pulse_townhall():
     vader_analyzer = SentimentIntensityAnalyzer()
 
     # Language selection
-    #language = st.selectbox("Select Language :grey[(_Default: English | if you choose other than english, then the machine will automatically convert it to english prior further processing_])", 
-                            #["English", "Indonesia"])
-
-    # Custom CSS for the information icon and tooltip
-    st.markdown("""
-        <style>
-        .info-icon {
-            display: inline-block;
-            position: relative;
-            cursor: pointer;
-            color: green;
-            margin-left: 5px;
-            margin-top: 3px; /* Adjust this value to move the icon down */
-        }
-        .info-icon:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
-        .tooltip {
-            visibility: hidden;
-            opacity: 0;
-            width: 400px;
-            background-color: green;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%; /* Position the tooltip above the icon */
-            left: 50%;
-            margin-left: -100px;
-            transition: opacity 0.3s;
-        }
-        .tooltip::after {
-            content: "";
-            position: absolute;
-            top: 100%; /* Arrow at the bottom of the tooltip */
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: black transparent transparent transparent;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
-    # Language selection with information icon
-    st.markdown("""
-        <div style="display: flex; align-items: center;">
-            <label for="language-select">Select Language</label>
-            <div class="info-icon">
-                ⓘ
-                <span class="tooltip">Default: English | If you choose other than English, the machine will automatically convert it to English prior to further processing.</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    language = st.selectbox("", ["English", "Indonesia"], key="language-select")
-
+    language = st.selectbox("Select Language", ["English", "Indonesia"])
 
     # File upload section side by side
     col1, col2 = st.columns(2)
@@ -155,8 +95,6 @@ def csat_lifecycle_pulse_townhall():
                 subtopics_df = pd.read_excel(master_db_path, sheet_name="Lifecycle")
             elif data_type == "Contact Center":
                 subtopics_df = pd.read_excel(master_db_path, sheet_name="Contact Center")
-            elif data_type == "Townhall":
-                subtopics_df = pd.read_excel(master_db_path, sheet_name="Townhall")
                 
             comments_df = pd.read_excel(comments_file)
             
@@ -434,7 +372,7 @@ def csat_lifecycle_pulse_townhall():
                         filtered_subtopics = combined_df[combined_df['Predicted Topic'] == selected_topic]['Predicted Sub Topic'].unique().tolist()
                     else:
                         filtered_subtopics = combined_df['Predicted Sub Topic'].unique().tolist()
-                    selected_subtopic = st.selectbox("Filter by Sub Topic", options=["All", "Undefined"] + filtered_subtopics)
+                    selected_subtopic = st.selectbox("Filter by Sub Topic", options=["All"] + filtered_subtopics)
 
                 # Filter the data based on the selected topic and subtopic
                 if selected_topic != "All":
@@ -497,7 +435,7 @@ def csat_lifecycle_pulse_townhall():
                 with col2:
                     subtopic_filter = st.selectbox("Filter by  Sub Topic", options=["All", "undefined"] + labels)
                 with col3:
-                    topic_filter = st.selectbox("Filter by Topic", options=["All","undefined"] + subtopics_df['Category'].unique().tolist())
+                    topic_filter = st.selectbox("Filter by Topic", options=["All"] + subtopics_df['Category'].unique().tolist())
 
                 filtered_df = filter_data(sentiment_filter, subtopic_filter, topic_filter)
 
@@ -890,4 +828,3 @@ elif st.session_state.page == 'Contact Center':
     contact_center()
 elif st.session_state.page == 'High Performance Processing':
     high_performance_processing()
-
