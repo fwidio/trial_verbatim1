@@ -26,21 +26,37 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Set the page configuration to wide
 st.set_page_config(layout="wide")
 
+st.markdown("""
+    <style>
+    div.stButton > button:hover {
+        background-color: #428dff;
+        color: white;
+        border: 2px solid #428dff;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 # Function to display the home page
 def home():
-    st.title("Welcome to the Python-Based Verbatim Tool")
+    st.title(":blue[📌 Welcome to the Python-Based Verbatim Tool]")
     st.caption("Version updated 25 October 2024")
-    st.caption("What's new? Contact Center Tool")
-    st.caption("Note: Please double click the button")
-    if st.button("CSAT, Lifecycle, Pulse, Townhall"):
-        st.session_state.page = "CSAT, Lifecycle, Pulse, Townhall"
-    if st.button("Contact Center"):
-        st.session_state.page = "Contact Center"
+
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        st.image("C:/Users/fwidio/Downloads/How to Use.png", use_column_width=True)
+        
+    with col2:
+        if st.button("CSAT | Lifecycle | Pulse | Townhall"):
+            st.session_state.page = "CSAT, Lifecycle, Pulse, Townhall"
+        if st.button("Contact Center"):
+            st.session_state.page = "Contact Center"
+        st.caption(":red[_Note: Please double click the button_]")
 
 # Function to display the CSAT, Lifecycle, Pulse, Townhall page
 def csat_lifecycle_pulse_townhall():
     # Streamlit app layout
-    st.title("Sentiment Analysis and Topic Prediction")
+    st.title(":blue[💡Sentiment Analysis and Topic Prediction]")
     
     # Download necessary NLTK data
     import nltk
@@ -51,7 +67,66 @@ def csat_lifecycle_pulse_townhall():
     vader_analyzer = SentimentIntensityAnalyzer()
 
     # Language selection
-    language = st.selectbox("Select Language", ["English", "Indonesia"])
+    #language = st.selectbox("Select Language :grey[(_Default: English | if you choose other than english, then the machine will automatically convert it to english prior further processing_])", 
+                            #["English", "Indonesia"])
+
+    # Custom CSS for the information icon and tooltip
+    st.markdown("""
+        <style>
+        .info-icon {
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            color: green;
+            margin-left: 5px;
+            margin-top: 3px; /* Adjust this value to move the icon down */
+        }
+        .info-icon:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            width: 400px;
+            background-color: green;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position the tooltip above the icon */
+            left: 50%;
+            margin-left: -100px;
+            transition: opacity 0.3s;
+        }
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%; /* Arrow at the bottom of the tooltip */
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: black transparent transparent transparent;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+    # Language selection with information icon
+    st.markdown("""
+        <div style="display: flex; align-items: center;">
+            <label for="language-select">Select Language</label>
+            <div class="info-icon">
+                ⓘ
+                <span class="tooltip">Default: English | If you choose other than English, the machine will automatically convert it to English prior to further processing.</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    language = st.selectbox("", ["English", "Indonesia"], key="language-select")
+
 
     # File upload section side by side
     col1, col2 = st.columns(2)
@@ -80,6 +155,8 @@ def csat_lifecycle_pulse_townhall():
                 subtopics_df = pd.read_excel(master_db_path, sheet_name="Lifecycle")
             elif data_type == "Contact Center":
                 subtopics_df = pd.read_excel(master_db_path, sheet_name="Contact Center")
+            elif data_type == "Townhall":
+                subtopics_df = pd.read_excel(master_db_path, sheet_name="Townhall")
                 
             comments_df = pd.read_excel(comments_file)
             
@@ -357,7 +434,7 @@ def csat_lifecycle_pulse_townhall():
                         filtered_subtopics = combined_df[combined_df['Predicted Topic'] == selected_topic]['Predicted Sub Topic'].unique().tolist()
                     else:
                         filtered_subtopics = combined_df['Predicted Sub Topic'].unique().tolist()
-                    selected_subtopic = st.selectbox("Filter by Sub Topic", options=["All"] + filtered_subtopics)
+                    selected_subtopic = st.selectbox("Filter by Sub Topic", options=["All", "Undefined"] + filtered_subtopics)
 
                 # Filter the data based on the selected topic and subtopic
                 if selected_topic != "All":
@@ -420,7 +497,7 @@ def csat_lifecycle_pulse_townhall():
                 with col2:
                     subtopic_filter = st.selectbox("Filter by  Sub Topic", options=["All", "undefined"] + labels)
                 with col3:
-                    topic_filter = st.selectbox("Filter by Topic", options=["All"] + subtopics_df['Category'].unique().tolist())
+                    topic_filter = st.selectbox("Filter by Topic", options=["All","undefined"] + subtopics_df['Category'].unique().tolist())
 
                 filtered_df = filter_data(sentiment_filter, subtopic_filter, topic_filter)
 
@@ -441,8 +518,9 @@ def csat_lifecycle_pulse_townhall():
 
 # Function to display the Contact Center page
 def contact_center():
-    st.header("Contact Center")
-    st.write("Content for Contact Center page goes here.")
+    st.write(":red[_Click below button for higher result accuracy (Note: This process may take longer time_])")
+    if st.button("High Performance Processing"):
+        st.session_state.page = "High Performance Processing"
 
     # Function to clean the 'Subject' column
     def clean_subject(subject):
@@ -463,12 +541,18 @@ def contact_center():
         return words[0].isupper()
 
     # Streamlit app
-    st.title("Topic & Sub Topic Finder")
+    st.title(":blue[📞Topic & Sub Topic Finder - Contact Center]")
 
-    # Upload input file
-    input_file = st.file_uploader("Upload Input File", type=["xlsx"])
-    # Upload database file
-    database_file = st.file_uploader("Upload Database File", type=["xlsx"])
+    # Create two columns
+    col1, col2 = st.columns(2)
+
+    # Upload input file in the first column
+    with col1:
+        input_file = st.file_uploader("Upload Input File", type=["xlsx"])
+
+    # Upload database file in the second column
+    with col2:
+        database_file = st.file_uploader("Upload Database File", type=["xlsx"])
 
     if input_file and database_file:
         # Read the input file
@@ -611,6 +695,187 @@ def contact_center():
 
     if st.button("Back to Home Page"):
         st.session_state.page = "home"
+        
+        
+def high_performance_processing():
+    st.title(":blue[High Performance Processing]")
+    st.write(":red[_Attention: This process may take longer time_]")
+        
+    # Function to clean the 'Subject' column
+    def clean_subject(subject):
+        if pd.isna(subject):
+            return ""
+        subject = subject.replace('#', '')
+        subject = subject.replace('_', ' ')
+        subject = subject.replace('**', '')
+        subject = subject.replace(':', '')
+        subject = subject.replace('/', ' ')
+        subject = subject.replace('(', '')
+        subject = subject.replace(')', '')
+        return subject.strip()
+
+    # Function to check if the first word is all uppercase
+    def is_first_word_uppercase(sentence):
+        words = sentence.split()
+        return words[0].isupper()
+
+    # Upload input file
+    input_file = st.file_uploader("Upload Input File", type=["xlsx"])
+
+    # Database file path
+    database_file_path = r"C:\Users\fwidio\Documents\iCare Tag Mapping.xlsx"
+
+    if input_file:
+        # Read the input file
+        input_df = pd.read_excel(input_file)
+        
+        # Ensure the 'Subject' column exists
+        if 'Subject' not in input_df.columns:
+            st.error("The uploaded file does not contain a 'Subject' column.")
+        else:
+            # Read the topic database file
+            topic_df = pd.read_excel(database_file_path, sheet_name='tag')
+            # Read the subtopic database file
+            subtopic_df = pd.read_excel(database_file_path, sheet_name='subtag')
+            
+            # Clean the 'Subject' column in both dataframes
+            input_df['Subject'] = input_df['Subject'].apply(clean_subject)
+            topic_df['Cleaned_Subject'] = topic_df['Subject'].apply(clean_subject)
+            subtopic_df['Cleaned_Subject'] = subtopic_df['Subject'].apply(clean_subject)
+            
+            # Remove blank rows in the database
+            topic_df = topic_df[topic_df['Cleaned_Subject'] != ""]
+            subtopic_df = subtopic_df[subtopic_df['Cleaned_Subject'] != ""]
+            
+            # Initialize columns for 'Topic' and 'Sub Topic'
+            input_df['Topic'] = ""
+            input_df['Sub Topic'] = ""
+            
+            # Process each row independently
+            for i, row in input_df.iterrows():
+                # Vectorize the subjects using TF-IDF for topics
+                vectorizer_topic = TfidfVectorizer().fit_transform(topic_df['Cleaned_Subject'].tolist() + [row['Subject']])
+                
+                # Calculate cosine similarity between input subject and topic subjects
+                cosine_similarities_topic = cosine_similarity(vectorizer_topic[-1], vectorizer_topic[:-1])
+                
+                # Match subject and assign 'Topic'
+                if is_first_word_uppercase(row['Subject']):
+                    first_word = row['Subject'].split()[0]
+                    matched_topic = topic_df[topic_df['Cleaned_Subject'].str.startswith(first_word)]['Topic']
+                    if not matched_topic.empty:
+                        input_df.at[i, 'Topic'] = matched_topic.values[0]
+                else:
+                    most_similar_idx_topic = cosine_similarities_topic[0].argmax()
+                    if cosine_similarities_topic[0][most_similar_idx_topic] > 0.5:  # You can adjust the threshold as needed
+                        input_df.at[i, 'Topic'] = topic_df.iloc[most_similar_idx_topic]['Topic']
+                
+                # Vectorize the subjects using TF-IDF for subtopics
+                vectorizer_subtopic = TfidfVectorizer().fit_transform(subtopic_df['Cleaned_Subject'].tolist() + [row['Subject']])
+                
+                # Calculate cosine similarity between input subject and subtopic subjects
+                cosine_similarities_subtopic = cosine_similarity(vectorizer_subtopic[-1], vectorizer_subtopic[:-1])
+                
+                # Match subject and assign 'Sub Topic'
+                most_similar_idx_subtopic = cosine_similarities_subtopic[0].argmax()
+                if cosine_similarities_subtopic[0][most_similar_idx_subtopic] > 0.5:  # You can adjust the threshold as needed
+                    input_df.at[i, 'Sub Topic'] = subtopic_df.iloc[most_similar_idx_subtopic]['Sub Topic']
+            
+            # Handle cases where topic is blank by reading the 'blank' sheet
+            blank_sheet = pd.read_excel(database_file_path, sheet_name='blank')
+            
+            for i, row in input_df.iterrows():
+                if row['Topic'] == "":
+                    for j, blank_row in blank_sheet.iterrows():
+                        relevant_word = blank_row['Relevant Word']
+                        if relevant_word == "TA":
+                            if "TA" in row['Subject']:
+                                input_df.at[i, 'Topic'] = blank_row['Topic']
+                                break
+                        elif relevant_word.lower() in row['Subject'].lower():
+                            input_df.at[i, 'Topic'] = blank_row['Topic']
+                            break
+
+            # Display the updated dataframe
+            st.write("Updated DataFrame:")
+            st.dataframe(input_df)
+            
+            # Option to download the updated dataframe
+            st.download_button(
+                label="Download Updated Data",
+                data=input_df.to_csv(index=False).encode('utf-8'),
+                file_name='updated_input_file.csv',
+                mime='text/csv'
+            )
+            
+            # Count the number of occurrences of each topic
+            topic_counts = input_df['Topic'].value_counts().sort_values(ascending=False)
+            
+            # Get top 10 topics with their counts and percentages
+            top_10_topics_counts = topic_counts.head(10)
+            top_10_topics_percentages = (top_10_topics_counts / topic_counts.sum()) * 100
+            
+            # Create DataFrame with formatted percentages rounded to one decimal place
+            top_10_table_data = pd.DataFrame({
+                'Topic': top_10_topics_counts.index,
+                'Count': top_10_topics_counts.values,
+                'Percentage': [f"{x:.1f}%" for x in top_10_topics_percentages.values]
+            })
+
+            # Adjust the index to start from 1
+            top_10_table_data.index = range(1, len(top_10_table_data) + 1)
+
+            # Display total number of transactions above the table
+            total_transactions = len(input_df)
+            st.write(f"Total transactions: {total_transactions}")
+
+            # Display the table dynamically
+            st.write("Top 10 Topics with Counts and Percentages:")
+            st.dataframe(top_10_table_data.style.set_properties(**{'text-align': 'center'}).set_table_styles(
+                [{'selector': 'th', 'props': [('text-align', 'center')]}]
+            ))
+            
+            # Get top 3 subtopics for each of the top 10 topics with their counts and percentages compared to overall data
+            top_3_subtopics_data_overall = []
+            for topic in top_10_topics_counts.index:
+                subtopics_counts_overall = input_df[input_df['Topic'] == topic]['Sub Topic'].value_counts().head(3)
+                subtopics_percentages_overall = (subtopics_counts_overall / total_transactions) * 100
+
+                for subtopic, count, percentage in zip(subtopics_counts_overall.index, subtopics_counts_overall.values, subtopics_percentages_overall.values):
+                    top_3_subtopics_data_overall.append({
+                        'Topic': topic,
+                        'Sub Topic': subtopic,
+                        'Count': count,
+                        'Percentage': f"{percentage:.1f}%"
+                    })
+
+            top_3_subtopics_table_data_overall = pd.DataFrame(top_3_subtopics_data_overall)
+
+            # Display the subtopic table dynamically
+            st.write("Top 3 Subtopics for Each Top Topic with Counts and Percentages Compared to Overall Data:")
+            st.dataframe(top_3_subtopics_table_data_overall.style.set_properties(**{'text-align': 'center'}).set_table_styles(
+                [{'selector': 'th', 'props': [('text-align', 'center')]}]
+            ))
+
+            # Plot the bar chart with Plotly Express for better aesthetics and dynamic interactivity with Streamlit
+            st.write("Number of Topics (sorted by highest to lowest count):")
+            
+            fig1 = px.bar(topic_counts, x=topic_counts.values, y=topic_counts.index, orientation='h', 
+                        labels={'x': 'Count', 'y': 'Topics'}, title='Number of Topics')
+            
+            # Update layout to format percentages, start numbering from 1, and center text
+            fig1.update_layout(yaxis={'categoryorder':'total ascending'}, height=1000)
+            fig1.update_traces(texttemplate='%{x}', textposition='inside', insidetextanchor='middle')
+            
+            st.plotly_chart(fig1)
+            
+    col = st.columns(1)
+    with col[0]:
+        if st.button("Back to Home Page"):
+            st.session_state.page = "home"
+        if st.button("Back to Contact Center"):
+            st.session_state.page = "Contact Center"
+
 
 # Initialize session state
 if 'page' not in st.session_state:
@@ -623,3 +888,6 @@ elif st.session_state.page == 'CSAT, Lifecycle, Pulse, Townhall':
     csat_lifecycle_pulse_townhall()
 elif st.session_state.page == 'Contact Center':
     contact_center()
+elif st.session_state.page == 'High Performance Processing':
+    high_performance_processing()
+
