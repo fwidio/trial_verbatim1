@@ -1213,7 +1213,7 @@ if 'page' not in st.session_state:
 # Navigation logic
 if st.session_state.page == 'home':
     home()
-elif st.session_state.page == 'CSAT, Lifecycle2, Pulse, Townhall':
+elif st.session_state.page == 'CSAT, Lifecycle, Pulse, Townhall':
     csat_lifecycle2_pulse_townhall()
 elif st.session_state.page == 'Contact Center':
     contact_center()
