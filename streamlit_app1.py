@@ -52,7 +52,7 @@ def home():
         
     with col2:
         if st.button("CSAT | Lifecycle | Pulse"):
-            st.session_state.page = "CSAT, Lifecycle2, Pulse, Townhall"
+            st.session_state.page = "CSAT, Lifecycle, Pulse, Townhall"
         if st.button("Contact Center"):
             st.session_state.page = "Contact Center"
         if st.button("Townhall"):
@@ -60,7 +60,7 @@ def home():
         st.caption(":red[_Note: Please double click the button_]")
 
 # Function to display the CSAT, Lifecycle, Pulse, Townhall page
-def csat_lifecycle2_pulse_townhall():
+def csat_lifecycle_pulse_townhall():
     # Streamlit app layout
     st.title(":blue[💡Sentiment Analysis and Topic Prediction]")
 
@@ -135,7 +135,7 @@ def csat_lifecycle2_pulse_townhall():
     
     with col1:
         # Selection of type of data
-        data_type = st.selectbox("Select the type of data", ["Pulse Survey", "CSAT Feedback", "Lifecycle2","Townhall"])
+        data_type = st.selectbox("Select the type of data", ["Pulse Survey", "CSAT Feedback", "Lifecycle","Townhall"])
     
     with col2:
         master_db_path = st.file_uploader("Upload your Master Database (.xlsx)", type="xlsx")
