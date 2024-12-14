@@ -552,8 +552,8 @@ def csat():
                     mime='text/csv',
                 )
                 
-                if st.button("Back to Home Page"):
-                    st.session_state.page = "home"
+    if st.button("Back to Home Page"):
+        st.session_state.page = "home"
 
 # Function to display the CSAT, Lifecycle, Pulse, Townhall page
 def csat_lifecycle_pulse_townhall():
@@ -1014,8 +1014,8 @@ def csat_lifecycle_pulse_townhall():
                     mime='text/csv',
                 )
                 
-                if st.button("Back to Home Page"):
-                    st.session_state.page = "home"
+    if st.button("Back to Home Page"):
+        st.session_state.page = "home"
                     
 # Function to display the Contact Center page
 def contact_center():
