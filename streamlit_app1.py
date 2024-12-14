@@ -1214,7 +1214,7 @@ if 'page' not in st.session_state:
 if st.session_state.page == 'home':
     home()
 elif st.session_state.page == 'CSAT, Lifecycle, Pulse, Townhall':
-    csat_lifecycle2_pulse_townhall()
+    csat_lifecycle_pulse_townhall()
 elif st.session_state.page == 'Contact Center':
     contact_center()
 elif st.session_state.page == 'Townhall':
