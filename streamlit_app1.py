@@ -157,7 +157,7 @@ def csat_lifecycle2_pulse_townhall():
             elif data_type == "CSAT Feedback":
                 subtopics_df = pd.read_excel(master_db_path, sheet_name="CSAT")
             elif data_type == "Lifecycle2":
-                subtopics_df = pd.read_excel(master_db_path, sheet_name="Lifecycle2")
+                subtopics_df = pd.read_excel(master_db_path, sheet_name="Lifecycle")
             elif data_type == "Contact Center":
                 subtopics_df = pd.read_excel(master_db_path, sheet_name="Contact Center")
             
