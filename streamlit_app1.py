@@ -559,6 +559,8 @@ def csat():
 def csat_lifecycle_pulse_townhall():
     # Streamlit app layout
     st.title(":blue[💡Sentiment Analysis and Topic Prediction]")
+    st.write(":gray[1. Ensure you have the following **column title/header** in your **input file** = 'comment']")
+    st.write(":gray[2. Ensure you have the following **column name** in your **database file** = 'Category', 'Sub Category', 'Relevant Word']")
 
     # Download necessary NLTK data
     import nltk
